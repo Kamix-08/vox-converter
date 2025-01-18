@@ -1,8 +1,6 @@
 #include <fstream>
 
-#include "calculation.cpp"
-
-using namespace std;
+#include "calc.cpp"
 
 int read_file(const string& filename) {
     ifstream file(filename, ios::binary);
