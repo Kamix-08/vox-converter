@@ -2,7 +2,7 @@
 
 #include "calc.cpp"
 
-int load_model(const string& filename) {
+int load_model(const string& filename, out_data& model_data) {
     ifstream file(filename, ios::binary);
 
     if(!file) {
@@ -73,4 +73,12 @@ int load_model(const string& filename) {
     }
 
     file.close();
+
+    model_data = calculate_vertices({
+        size,
+        voxels,
+        palette
+    });
+
+    return 0;
 }

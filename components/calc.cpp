@@ -7,9 +7,9 @@
 using namespace std;
 
 struct read_data {
-    uint32_t size[3];
+    uint32_t* size;
     unordered_map<tuple<uint8_t, uint8_t, uint8_t>, unsigned char> voxels;
-    char palette[256][4];
+    char (*palette)[4];
 };
 
 struct out_data {
@@ -57,40 +57,40 @@ out_data calculate_vertices(const read_data& read_data) {
             switch (i)
             {
             case 0:
-                f_ver[0] = {center[0] + .5f, center[1] + .5f, center[2] + .5f};
+                f_ver[0] = {center[0] + .5f, center[1] - .5f, center[2] - .5f};
                 f_ver[1] = {center[0] + .5f, center[1] - .5f, center[2] + .5f};
                 f_ver[2] = {center[0] + .5f, center[1] + .5f, center[2] - .5f};
-                f_ver[3] = {center[0] + .5f, center[1] - .5f, center[2] - .5f};
+                f_ver[3] = {center[0] + .5f, center[1] + .5f, center[2] + .5f};
                 break;
             case 1:
-                f_ver[0] = {center[0] - .5f, center[1] + .5f, center[2] + .5f};
+                f_ver[0] = {center[0] - .5f, center[1] - .5f, center[2] - .5f};
                 f_ver[1] = {center[0] - .5f, center[1] - .5f, center[2] + .5f};
                 f_ver[2] = {center[0] - .5f, center[1] + .5f, center[2] - .5f};
-                f_ver[3] = {center[0] - .5f, center[1] - .5f, center[2] - .5f};
+                f_ver[3] = {center[0] - .5f, center[1] + .5f, center[2] + .5f};
                 break;
             case 2:
-                f_ver[0] = {center[0] + .5f, center[1] + .5f, center[2] + .5f};
+                f_ver[0] = {center[0] - .5f, center[1] + .5f, center[2] - .5f};
                 f_ver[1] = {center[0] - .5f, center[1] + .5f, center[2] + .5f};
                 f_ver[2] = {center[0] + .5f, center[1] + .5f, center[2] - .5f};
-                f_ver[3] = {center[0] - .5f, center[1] + .5f, center[2] - .5f};
+                f_ver[3] = {center[0] + .5f, center[1] + .5f, center[2] + .5f};
                 break;
             case 3:
-                f_ver[0] = {center[0] + .5f, center[1] - .5f, center[2] + .5f};
+                f_ver[0] = {center[0] - .5f, center[1] - .5f, center[2] - .5f};
                 f_ver[1] = {center[0] - .5f, center[1] - .5f, center[2] + .5f};
                 f_ver[2] = {center[0] + .5f, center[1] - .5f, center[2] - .5f};
-                f_ver[3] = {center[0] - .5f, center[1] - .5f, center[2] - .5f};
+                f_ver[3] = {center[0] + .5f, center[1] - .5f, center[2] + .5f};
                 break;
             case 4:
-                f_ver[0] = {center[0] + .5f, center[1] + .5f, center[2] + .5f};
+                f_ver[0] = {center[0] - .5f, center[1] - .5f, center[2] + .5f};
                 f_ver[1] = {center[0] - .5f, center[1] + .5f, center[2] + .5f};
                 f_ver[2] = {center[0] + .5f, center[1] - .5f, center[2] + .5f};
-                f_ver[3] = {center[0] - .5f, center[1] - .5f, center[2] + .5f};
+                f_ver[3] = {center[0] + .5f, center[1] + .5f, center[2] + .5f};
                 break;
             case 5:
-                f_ver[0] = {center[0] + .5f, center[1] + .5f, center[2] - .5f};
+                f_ver[0] = {center[0] - .5f, center[1] - .5f, center[2] - .5f};
                 f_ver[1] = {center[0] - .5f, center[1] + .5f, center[2] - .5f};
                 f_ver[2] = {center[0] + .5f, center[1] - .5f, center[2] - .5f};
-                f_ver[3] = {center[0] - .5f, center[1] - .5f, center[2] - .5f};
+                f_ver[3] = {center[0] + .5f, center[1] + .5f, center[2] - .5f};
                 break;
             }
 
