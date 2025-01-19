@@ -2,7 +2,7 @@
 
 #include "calc.cpp"
 
-int read_file(const string& filename) {
+int load_model(const string& filename) {
     ifstream file(filename, ios::binary);
 
     if(!file) {

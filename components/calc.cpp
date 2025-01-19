@@ -8,8 +8,14 @@ using namespace std;
 
 struct read_data {
     uint32_t size[3];
-    std::unordered_map<std::tuple<uint8_t, uint8_t, uint8_t>, unsigned char> voxels;
+    unordered_map<tuple<uint8_t, uint8_t, uint8_t>, unsigned char> voxels;
     char palette[256][4];
+};
+
+struct out_data {
+    unordered_map<uint16_t, tuple<uint8_t, uint8_t, uint8_t>> colors;
+    vector<tuple<float, float, float>> vertices;
+    vector<uint16_t> indices;
 };
 
 const char neighbour_map[6][3] = {
@@ -18,8 +24,16 @@ const char neighbour_map[6][3] = {
     {0, 0, 1}, { 0, 0,-1}  // +z, -z
 };
 
-void calculate_vertices(const read_data& read_data) {
-    unordered_map<tuple<float, float, float>, tuple<char, char, char, float>> vtxs;
+out_data calculate_vertices(const read_data& read_data) {
+    unordered_map<tuple<float, float, float>, tuple<uint16_t, uint16_t, uint16_t, uint8_t, uint8_t>> ver_col;
+
+    vector<tuple<float, float, float>> vertices;
+    vector<uint16_t> indices;
+
+    const float offset[2] = {
+        (read_data.size[0] - 1) / 2.0f,
+        (read_data.size[2] - 1) / 2.0f
+    };
 
     for(const auto& [pos, color] : read_data.voxels)
         for(uint8_t i=0; i<6; i++) {
@@ -38,68 +52,90 @@ void calculate_vertices(const read_data& read_data) {
             if(read_data.voxels.find(neighbour_pos) != read_data.voxels.end()) 
                 continue;
 
-            tuple<float, float, float> vtx[4];
+            tuple<float, float, float> f_ver[4];
 
             switch (i)
             {
             case 0:
-                vtx[0] = {center[0] + .5f, center[1] + .5f, center[2] + .5f};
-                vtx[1] = {center[0] + .5f, center[1] - .5f, center[2] + .5f};
-                vtx[2] = {center[0] + .5f, center[1] + .5f, center[2] - .5f};
-                vtx[3] = {center[0] + .5f, center[1] - .5f, center[2] - .5f};
+                f_ver[0] = {center[0] + .5f, center[1] + .5f, center[2] + .5f};
+                f_ver[1] = {center[0] + .5f, center[1] - .5f, center[2] + .5f};
+                f_ver[2] = {center[0] + .5f, center[1] + .5f, center[2] - .5f};
+                f_ver[3] = {center[0] + .5f, center[1] - .5f, center[2] - .5f};
                 break;
             case 1:
-                vtx[0] = {center[0] - .5f, center[1] + .5f, center[2] + .5f};
-                vtx[1] = {center[0] - .5f, center[1] - .5f, center[2] + .5f};
-                vtx[2] = {center[0] - .5f, center[1] + .5f, center[2] - .5f};
-                vtx[3] = {center[0] - .5f, center[1] - .5f, center[2] - .5f};
+                f_ver[0] = {center[0] - .5f, center[1] + .5f, center[2] + .5f};
+                f_ver[1] = {center[0] - .5f, center[1] - .5f, center[2] + .5f};
+                f_ver[2] = {center[0] - .5f, center[1] + .5f, center[2] - .5f};
+                f_ver[3] = {center[0] - .5f, center[1] - .5f, center[2] - .5f};
                 break;
             case 2:
-                vtx[0] = {center[0] + .5f, center[1] + .5f, center[2] + .5f};
-                vtx[1] = {center[0] - .5f, center[1] + .5f, center[2] + .5f};
-                vtx[2] = {center[0] + .5f, center[1] + .5f, center[2] - .5f};
-                vtx[3] = {center[0] - .5f, center[1] + .5f, center[2] - .5f};
+                f_ver[0] = {center[0] + .5f, center[1] + .5f, center[2] + .5f};
+                f_ver[1] = {center[0] - .5f, center[1] + .5f, center[2] + .5f};
+                f_ver[2] = {center[0] + .5f, center[1] + .5f, center[2] - .5f};
+                f_ver[3] = {center[0] - .5f, center[1] + .5f, center[2] - .5f};
                 break;
             case 3:
-                vtx[0] = {center[0] + .5f, center[1] - .5f, center[2] + .5f};
-                vtx[1] = {center[0] - .5f, center[1] - .5f, center[2] + .5f};
-                vtx[2] = {center[0] + .5f, center[1] - .5f, center[2] - .5f};
-                vtx[3] = {center[0] - .5f, center[1] - .5f, center[2] - .5f};
+                f_ver[0] = {center[0] + .5f, center[1] - .5f, center[2] + .5f};
+                f_ver[1] = {center[0] - .5f, center[1] - .5f, center[2] + .5f};
+                f_ver[2] = {center[0] + .5f, center[1] - .5f, center[2] - .5f};
+                f_ver[3] = {center[0] - .5f, center[1] - .5f, center[2] - .5f};
                 break;
             case 4:
-                vtx[0] = {center[0] + .5f, center[1] + .5f, center[2] + .5f};
-                vtx[1] = {center[0] - .5f, center[1] + .5f, center[2] + .5f};
-                vtx[2] = {center[0] + .5f, center[1] - .5f, center[2] + .5f};
-                vtx[3] = {center[0] - .5f, center[1] - .5f, center[2] + .5f};
+                f_ver[0] = {center[0] + .5f, center[1] + .5f, center[2] + .5f};
+                f_ver[1] = {center[0] - .5f, center[1] + .5f, center[2] + .5f};
+                f_ver[2] = {center[0] + .5f, center[1] - .5f, center[2] + .5f};
+                f_ver[3] = {center[0] - .5f, center[1] - .5f, center[2] + .5f};
                 break;
             case 5:
-                vtx[0] = {center[0] + .5f, center[1] + .5f, center[2] - .5f};
-                vtx[1] = {center[0] - .5f, center[1] + .5f, center[2] - .5f};
-                vtx[2] = {center[0] + .5f, center[1] - .5f, center[2] - .5f};
-                vtx[3] = {center[0] - .5f, center[1] - .5f, center[2] - .5f};
+                f_ver[0] = {center[0] + .5f, center[1] + .5f, center[2] - .5f};
+                f_ver[1] = {center[0] - .5f, center[1] + .5f, center[2] - .5f};
+                f_ver[2] = {center[0] + .5f, center[1] - .5f, center[2] - .5f};
+                f_ver[3] = {center[0] - .5f, center[1] - .5f, center[2] - .5f};
                 break;
             }
 
-            for(const auto& v : vtx) {
-                get<0>(vtxs[v]) += read_data.palette[color][0];
-                get<1>(vtxs[v]) += read_data.palette[color][1];
-                get<2>(vtxs[v]) += read_data.palette[color][2];
-                get<3>(vtxs[v]) *= (static_cast<float>(read_data.palette[color][3])/255 + 2);
+            uint16_t idx[4];
+
+            for(uint8_t ii=0; ii<4; ii++) {
+                auto& ver = f_ver[ii];
+
+                get<0>(ver) -= offset[0];
+                get<2>(ver) -= offset[1];
+
+                if(ver_col.find(ver) == ver_col.end()) {
+                    vertices.push_back(ver);
+                    idx[ii] = vertices.size() - 1;
+                } else
+                    idx[ii] = get<4>(ver_col[ver]);
+
+                get<0>(ver_col[ver]) += read_data.palette[color][0]; // r
+                get<1>(ver_col[ver]) += read_data.palette[color][1]; // g
+                get<2>(ver_col[ver]) += read_data.palette[color][2]; // b
+                get<3>(ver_col[ver])++;                              // n (avg)
+                get<4>(ver_col[ver]) = idx[ii];                      // idx
             }
+
+            indices.push_back(idx[0]); indices.push_back(idx[1]); indices.push_back(idx[2]); // triangle 1
+            indices.push_back(idx[1]); indices.push_back(idx[2]); indices.push_back(idx[3]); // triangle 2
         }
 
-    for(auto& vtx : vtxs) {
-        uint8_t a = get<3>(vtx.second);
-        uint8_t n = 0;
-
-        while(a != 1) {
-            a >>= 1;
-            n++;
-        }
+    for(auto& vtx : ver_col) {
+        uint8_t n = get<3>(vtx.second);
 
         get<0>(vtx.second) /= n;
         get<1>(vtx.second) /= n;
         get<2>(vtx.second) /= n;
-        get<3>(vtx.second) -= a;
     }
+
+    unordered_map<uint16_t, tuple<uint8_t, uint8_t, uint8_t>> colors;
+    for(auto& vtx : ver_col) {
+        const auto& color_data = vtx.second;
+        colors[get<4>(color_data)] = {get<0>(color_data), get<1>(color_data), get<2>(color_data)};
+    }
+
+    return {
+        colors,
+        vertices,
+        indices
+    };
 }
