@@ -1,6 +1,11 @@
 #include <filesystem>
+#include <vector>
+#include <iostream>
 
-#include "components/read.cpp"
+#include "../include/Vox.hpp"
+
+using namespace std;
+using namespace vox;
 
 namespace fs = std::filesystem;
 

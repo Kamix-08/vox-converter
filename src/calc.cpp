@@ -1,47 +1,20 @@
-#include <string>
-#include <vector>
+#include "../include/calc.hpp"
+
+#include <tuple>
 #include <unordered_map>
-#include <unordered_set>
 #include <cstdint>
-#include <iostream>
+#include <vector>
 
-using namespace std;
+template <typename T1, typename T2, typename T3>
+size_t vox::tuple_hash::operator()(const std::tuple<T1, T2, T3>& t) const {
+    return std::get<0>(t) + std::get<1>(t) + std::get<2>(t);
+}
 
-// why is this not built in??
-struct tuple_hash {
-    template <typename T1, typename T2, typename T3>
-    size_t operator()(const tuple<T1, T2, T3>& t) const {
-        auto h1 = hash<T1>{}(get<0>(t));
-        auto h2 = hash<T2>{}(get<1>(t));
-        auto h3 = hash<T3>{}(get<2>(t));
+vox::out_data vox::calculate_vertices(const vox::read_data& read_data) {
+    std::unordered_map<std::tuple<float, float, float>, std::tuple<uint16_t, uint16_t, uint16_t, uint8_t, uint8_t>, vox::tuple_hash> ver_col;
 
-        return h1 ^ h2 ^ h3;
-    }
-};
-
-struct read_data {
-    uint32_t* size;
-    unordered_map<tuple<uint8_t, uint8_t, uint8_t>, unsigned char, tuple_hash> voxels;
-    char (*palette)[4];
-};
-
-struct out_data {
-    unordered_map<uint16_t, tuple<uint8_t, uint8_t, uint8_t>> colors;
-    vector<tuple<float, float, float>> vertices;
-    vector<uint16_t> indices;
-};
-
-const char neighbour_map[6][3] = {
-    {1, 0, 0}, {-1, 0, 0}, // +x, -x
-    {0, 1, 0}, { 0,-1, 0}, // +y, -y
-    {0, 0, 1}, { 0, 0,-1}  // +z, -z
-};
-
-static out_data calculate_vertices(const read_data& read_data) {
-    unordered_map<tuple<float, float, float>, tuple<uint16_t, uint16_t, uint16_t, uint8_t, uint8_t>, tuple_hash> ver_col;
-
-    vector<tuple<float, float, float>> vertices;
-    vector<uint16_t> indices;
+    std::vector<std::tuple<float, float, float>> vertices;
+    std::vector<uint16_t> indices;
 
     const float offset[2] = {
         (read_data.size[0] - 1) / 2.0f,
@@ -51,21 +24,21 @@ static out_data calculate_vertices(const read_data& read_data) {
     for(const auto& [pos, color] : read_data.voxels)
         for(uint8_t i=0; i<6; i++) {
             uint8_t center[3] = {
-                get<0>(pos),
-                get<1>(pos),
-                get<2>(pos)
+                std::get<0>(pos),
+                std::get<1>(pos),
+                std::get<2>(pos)
             };
 
-            tuple<uint8_t, uint8_t, uint8_t> neighbour_pos = {
-                center[0] + neighbour_map[i][0],
-                center[1] + neighbour_map[i][1],
-                center[2] + neighbour_map[i][2]
+            std::tuple<uint8_t, uint8_t, uint8_t> neighbour_pos = {
+                center[0] + vox::neighbour_map[i][0],
+                center[1] + vox::neighbour_map[i][1],
+                center[2] + vox::neighbour_map[i][2]
             };
 
             if(read_data.voxels.find(neighbour_pos) != read_data.voxels.end()) 
                 continue;
 
-            tuple<float, float, float> f_ver[4];
+            std::tuple<float, float, float> f_ver[4];
 
             switch (i)
             {
@@ -112,20 +85,19 @@ static out_data calculate_vertices(const read_data& read_data) {
             for(uint8_t ii=0; ii<4; ii++) {
                 auto& ver = f_ver[ii];
 
-                get<0>(ver) -= offset[0];
-                get<2>(ver) -= offset[1];
+                std::get<0>(ver) -= offset[0];
+                std::get<2>(ver) -= offset[1];
 
                 if(ver_col.find(ver) == ver_col.end()) {
                     vertices.push_back(ver);
                     idx[ii] = vertices.size() - 1;
                 } else
-                    idx[ii] = get<4>(ver_col[ver]);
+                    idx[ii] = std::get<4>(ver_col[ver]);
 
-                get<0>(ver_col[ver]) += read_data.palette[color][0]; // r
-                get<1>(ver_col[ver]) += read_data.palette[color][1]; // g
-                get<2>(ver_col[ver]) += read_data.palette[color][2]; // b
-                get<3>(ver_col[ver])++;                              // n (avg)
-                get<4>(ver_col[ver]) = idx[ii];                      // idx
+                std::get<1>(ver_col[ver]) += read_data.palette[color][1]; // g
+                std::get<2>(ver_col[ver]) += read_data.palette[color][2]; // b
+                std::get<3>(ver_col[ver])++;                              // n (avg)
+                std::get<4>(ver_col[ver]) = idx[ii];                      // idx
             }
 
             indices.push_back(idx[0]); indices.push_back(idx[1]); indices.push_back(idx[2]); // triangle 1
@@ -133,17 +105,17 @@ static out_data calculate_vertices(const read_data& read_data) {
         }
 
     for(auto& vtx : ver_col) {
-        uint8_t n = get<3>(vtx.second);
+        uint8_t n = std::get<3>(vtx.second);
 
-        get<0>(vtx.second) /= n;
-        get<1>(vtx.second) /= n;
-        get<2>(vtx.second) /= n;
+        std::get<0>(vtx.second) /= n;
+        std::get<1>(vtx.second) /= n;
+        std::get<2>(vtx.second) /= n;
     }
 
-    unordered_map<uint16_t, tuple<uint8_t, uint8_t, uint8_t>> colors;
+    std::unordered_map<uint16_t, std::tuple<uint8_t, uint8_t, uint8_t>> colors;
     for(auto& vtx : ver_col) {
         const auto& color_data = vtx.second;
-        colors[get<4>(color_data)] = {get<0>(color_data), get<1>(color_data), get<2>(color_data)};
+        colors[std::get<4>(color_data)] = {std::get<0>(color_data), std::get<1>(color_data), std::get<2>(color_data)};
     }
 
     return {
