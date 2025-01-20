@@ -1,8 +1,11 @@
 #include <fstream>
+#include <chrono>
 
 #include "calc.cpp"
 
-int load_model(const string& filename, out_data& model_data) {
+static int load_model(const string& filename, out_data& model_data) {
+    auto start = chrono::system_clock::now();
+
     ifstream file(filename, ios::binary);
 
     if(!file) {
@@ -50,7 +53,7 @@ int load_model(const string& filename, out_data& model_data) {
     uint32_t num_voxels;
     file.read((char*)&num_voxels, 4);
 
-    unordered_map<tuple<uint8_t, uint8_t, uint8_t>, unsigned char> voxels;
+    unordered_map<tuple<uint8_t, uint8_t, uint8_t>, unsigned char, tuple_hash> voxels;
     for (uint32_t i = 0; i < num_voxels; i++) {
         file.read((char*)buff, 4);
         voxels[{buff[0], buff[1], buff[2]}] = buff[3];
@@ -79,6 +82,11 @@ int load_model(const string& filename, out_data& model_data) {
         voxels,
         palette
     });
+
+    auto end = chrono::system_clock::now();
+
+    cout << "[.] Loaded model: " << filename << "\n";
+    cout << "[.] Time taken: " << chrono::duration_cast<chrono::milliseconds>(end - start).count() << "ms\n\n";
 
     return 0;
 }

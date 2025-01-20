@@ -2,13 +2,26 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+#include <cstdint>
 #include <iostream>
 
 using namespace std;
 
+// why is this not built in??
+struct tuple_hash {
+    template <typename T1, typename T2, typename T3>
+    size_t operator()(const tuple<T1, T2, T3>& t) const {
+        auto h1 = hash<T1>{}(get<0>(t));
+        auto h2 = hash<T2>{}(get<1>(t));
+        auto h3 = hash<T3>{}(get<2>(t));
+
+        return h1 ^ h2 ^ h3;
+    }
+};
+
 struct read_data {
     uint32_t* size;
-    unordered_map<tuple<uint8_t, uint8_t, uint8_t>, unsigned char> voxels;
+    unordered_map<tuple<uint8_t, uint8_t, uint8_t>, unsigned char, tuple_hash> voxels;
     char (*palette)[4];
 };
 
@@ -24,8 +37,8 @@ const char neighbour_map[6][3] = {
     {0, 0, 1}, { 0, 0,-1}  // +z, -z
 };
 
-out_data calculate_vertices(const read_data& read_data) {
-    unordered_map<tuple<float, float, float>, tuple<uint16_t, uint16_t, uint16_t, uint8_t, uint8_t>> ver_col;
+static out_data calculate_vertices(const read_data& read_data) {
+    unordered_map<tuple<float, float, float>, tuple<uint16_t, uint16_t, uint16_t, uint8_t, uint8_t>, tuple_hash> ver_col;
 
     vector<tuple<float, float, float>> vertices;
     vector<uint16_t> indices;

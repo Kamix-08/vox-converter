@@ -17,17 +17,14 @@ int main(int argc, char* argv[])
 
                 models.push_back(tmp);
             }
-
-        return 0;
     } else {
         models.resize(argc-1);
 
         for(int i=1; i<argc; i++)
-            if(load_model(argv[i], models[i-1]) == 0)
-                cout << "[.] Loaded model. (" << argv[i] << ")\n";
+            load_model(argv[i], models[i-1]);
     }
 
-    cout << "\n[.] Loaded " << models.size() << " models into the vector.\n";
+    cout << "[.] Loaded " << models.size() << " models into the vector.\n";
     
     return 0;
 }

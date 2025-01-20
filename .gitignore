@@ -1,2 +1,3 @@
-.vox
+*.vox
+*.exe
 .vscode
