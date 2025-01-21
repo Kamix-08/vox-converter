@@ -7,10 +7,11 @@
 #include <vector>
 
 namespace vox {
-    // why is this not built in??
+    const size_t MOD = 18446744073709551557ULL;
+
     struct tuple_hash {
-        template <typename T1, typename T2, typename T3>
-        size_t operator()(const std::tuple<T1, T2, T3>& t) const;
+        template <typename T1>
+        size_t operator()(const std::tuple<T1, T1, T1>& t) const;
     };
 
     struct read_data {

@@ -5,9 +5,18 @@
 #include <cstdint>
 #include <vector>
 
-template <typename T1, typename T2, typename T3>
-size_t vox::tuple_hash::operator()(const std::tuple<T1, T2, T3>& t) const {
-    return std::get<0>(t) + std::get<1>(t) + std::get<2>(t);
+template <typename T1>
+size_t vox::tuple_hash::operator()(const std::tuple<T1, T1, T1>& t) const {
+    const auto hasher = std::hash<T1>{};
+    
+    size_t act_p = 1;
+    size_t res = 0;
+
+    res += hasher(std::get<0>(t)) * act_p; act_p = act_p * vox::MOD;
+    res += hasher(std::get<1>(t)) * act_p; act_p = act_p * vox::MOD;
+    res += hasher(std::get<2>(t)) * act_p;
+
+    return res;
 }
 
 vox::out_data vox::calculate_vertices(const vox::read_data& read_data) {
