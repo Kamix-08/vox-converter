@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <tuple>
 
-int vox::load_model(const std::string& filename, vox::out_data& model_data) {
+int vox::load_model(const std::string& filename, vox::model_data& model_data) {
     auto start = std::chrono::system_clock::now();
 
     std::ifstream file(filename, std::ios::binary);

@@ -2,7 +2,7 @@
 #include <vector>
 #include <iostream>
 
-#include "../include/Vox.hpp"
+#include "../Vox.hpp"
 
 using namespace std;
 using namespace vox;
@@ -11,8 +11,8 @@ namespace fs = std::filesystem;
 
 int main(int argc, char* argv[])
 {
-    vector<out_data> models;
-    out_data tmp;
+    vector<model_data> models;
+    model_data tmp;
 
     if(argc == 1) {
         for(const auto& entry : fs::directory_iterator("./"))
