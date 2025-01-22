@@ -6,7 +6,7 @@
 bool is_valid(const std::map<std::pair<uint8_t, uint8_t>, unsigned char>& cells, std::set<std::pair<uint8_t, uint8_t>>& visited, const std::pair<uint8_t, uint8_t>& next, unsigned char color) {
     if(!visited.insert(next).second) return false;
     
-    auto cell = cells.find(next);
+    const auto& cell = cells.find(next);
     if(cell == cells.end() || cell->second != color) return false;
         
     return true;
@@ -37,18 +37,17 @@ vox::model_data vox::merge_voxels(vox::process_data process_data) {
                 };
 
                 while(true) {
-                    std::pair<uint8_t, uint8_t> next = {res[2]+1, res[3]};
+                    if(!is_valid(cells, visited, {res[2]+1, res[1]}, color))
+                        break;
 
-                    if(is_valid(cells, visited, next, color))
-                        ++res[2];
+                    ++res[2];
                 }
 
                 while (true) {
                     bool fine = true;
-                    for (int j = res[0]; j <= res[2]; ++j) {
-                        fine = is_valid(cells, visited, {j, res[3]+1}, color);
-                        if (!fine) break;
-                    }
+                    for (int j = res[0]; j <= res[2]; ++j) 
+                        if(!(fine = is_valid(cells, visited, {j, res[3]+1}, color)))
+                            break;
 
                     if(!fine) break;
                     ++res[3];
