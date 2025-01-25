@@ -4,11 +4,11 @@
 #include <map>
 
 bool is_valid(const std::map<std::pair<uint8_t, uint8_t>, unsigned char>& cells, std::set<std::pair<uint8_t, uint8_t>>& visited, const std::pair<uint8_t, uint8_t>& next, unsigned char color) {
-    if(!visited.insert(next).second) return false;
+    if(visited.find(next) != visited.end()) return false;
     
     const auto& cell = cells.find(next);
     if(cell == cells.end() || cell->second != color) return false;
-        
+
     return true;
 }
 
@@ -37,10 +37,13 @@ vox::model_data vox::merge_voxels(vox::process_data process_data) {
                 };
 
                 while(true) {
-                    if(!is_valid(cells, visited, {res[2]+1, res[1]}, color))
+                    std::pair<uint8_t, uint8_t> next = {res[2]+1, res[1]};
+
+                    if(!is_valid(cells, visited, next, color))
                         break;
 
                     ++res[2];
+                    visited.insert(next);
                 }
 
                 while (true) {
@@ -50,41 +53,46 @@ vox::model_data vox::merge_voxels(vox::process_data process_data) {
                             break;
 
                     if(!fine) break;
+
                     ++res[3];
+                    for (int j = res[0]; j <= res[2]; ++j) 
+						visited.insert({j, res[3]});
                 }
 
-                std::tuple<float,float,float> f_ver[4];
+                std::tuple<float, float, float> f_ver[4] = {
+                    {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}
+                };
 
                 switch (i) {
                 case 0: // +x
-                    f_ver[0] = {depth + 0.5f, res[0] - 0.5f, res[1] - 0.5f};
-                    f_ver[1] = {depth + 0.5f, res[2] + 0.5f, res[1] - 0.5f};
-                    f_ver[2] = {depth + 0.5f, res[2] + 0.5f, res[3] + 0.5f};
-                    f_ver[3] = {depth + 0.5f, res[0] - 0.5f, res[3] + 0.5f};
+                    f_ver[0] = {depth + 0.5f, res[0] - 0.5f, res[3] + 0.5f};
+                    f_ver[1] = {depth + 0.5f, res[2] + 0.5f, res[3] + 0.5f};
+                    f_ver[2] = {depth + 0.5f, res[2] + 0.5f, res[1] - 0.5f};
+                    f_ver[3] = {depth + 0.5f, res[0] - 0.5f, res[1] - 0.5f};
                     break;
                 case 1: // -x
-                    f_ver[0] = {depth - 0.5f, res[0] - 0.5f, res[1] - 0.5f};
-                    f_ver[1] = {depth - 0.5f, res[2] + 0.5f, res[1] - 0.5f};
-                    f_ver[2] = {depth - 0.5f, res[2] + 0.5f, res[3] + 0.5f};
-                    f_ver[3] = {depth - 0.5f, res[0] - 0.5f, res[3] + 0.5f};
+                    f_ver[0] = {depth - 0.5f, res[2] + 0.5f, res[3] + 0.5f};
+                    f_ver[1] = {depth - 0.5f, res[0] - 0.5f, res[3] + 0.5f};
+                    f_ver[2] = {depth - 0.5f, res[0] - 0.5f, res[1] - 0.5f};
+                    f_ver[3] = {depth - 0.5f, res[2] + 0.5f, res[1] - 0.5f};
                     break;
                 case 2: // +y
-                    f_ver[0] = {res[0] - 0.5f, depth + 0.5f, res[1] - 0.5f};
-                    f_ver[1] = {res[2] + 0.5f, depth + 0.5f, res[1] - 0.5f};
-                    f_ver[2] = {res[2] + 0.5f, depth + 0.5f, res[3] + 0.5f};
-                    f_ver[3] = {res[0] - 0.5f, depth + 0.5f, res[3] + 0.5f};
+                    f_ver[0] = {res[2] + 0.5f, depth + 0.5f, res[3] + 0.5f};
+                    f_ver[1] = {res[0] - 0.5f, depth + 0.5f, res[3] + 0.5f};
+                    f_ver[2] = {res[0] - 0.5f, depth + 0.5f, res[1] - 0.5f};
+                    f_ver[3] = {res[2] + 0.5f, depth + 0.5f, res[1] - 0.5f};
                     break;
                 case 3: // -y
-                    f_ver[0] = {res[0] - 0.5f, depth - 0.5f, res[1] - 0.5f};
-                    f_ver[1] = {res[2] + 0.5f, depth - 0.5f, res[1] - 0.5f};
-                    f_ver[2] = {res[2] + 0.5f, depth - 0.5f, res[3] + 0.5f};
-                    f_ver[3] = {res[0] - 0.5f, depth - 0.5f, res[3] + 0.5f};
+                    f_ver[0] = {res[0] - 0.5f, depth - 0.5f, res[3] + 0.5f};
+                    f_ver[1] = {res[2] + 0.5f, depth - 0.5f, res[3] + 0.5f};
+                    f_ver[2] = {res[2] + 0.5f, depth - 0.5f, res[1] - 0.5f};
+                    f_ver[3] = {res[0] - 0.5f, depth - 0.5f, res[1] - 0.5f};
                     break;
                 case 4: // +z
-                    f_ver[0] = {res[0] - 0.5f, res[1] - 0.5f, depth + 0.5f};
-                    f_ver[1] = {res[2] + 0.5f, res[1] - 0.5f, depth + 0.5f};
-                    f_ver[2] = {res[2] + 0.5f, res[3] + 0.5f, depth + 0.5f};
-                    f_ver[3] = {res[0] - 0.5f, res[3] + 0.5f, depth + 0.5f};
+                    f_ver[0] = {res[0] - 0.5f, res[3] + 0.5f, depth + 0.5f};
+                    f_ver[1] = {res[2] + 0.5f, res[3] + 0.5f, depth + 0.5f};
+                    f_ver[2] = {res[2] + 0.5f, res[1] - 0.5f, depth + 0.5f};
+                    f_ver[3] = {res[0] - 0.5f, res[1] - 0.5f, depth + 0.5f};
                     break;
                 case 5: // -z
                     f_ver[0] = {res[0] - 0.5f, res[1] - 0.5f, depth - 0.5f};
@@ -106,6 +114,7 @@ vox::model_data vox::merge_voxels(vox::process_data process_data) {
                     }
 
                     const auto& clr = process_data.palette[color]; 
+
                     std::get<0>(ver->second) += clr[0]; // r
                     std::get<1>(ver->second) += clr[1]; // g
                     std::get<2>(ver->second) += clr[2]; // b
@@ -115,8 +124,8 @@ vox::model_data vox::merge_voxels(vox::process_data process_data) {
                     ind[j] = std::get<4>(ver->second);
                 }
 
-                indices.push_back(ind[0]); indices.push_back(ind[1]); indices.push_back(ind[2]); // triangle 1
-                indices.push_back(ind[0]); indices.push_back(ind[2]); indices.push_back(ind[3]); // triangle 2
+                indices.push_back(ind[2]); indices.push_back(ind[1]); indices.push_back(ind[0]); // triangle 1
+                indices.push_back(ind[3]); indices.push_back(ind[2]); indices.push_back(ind[0]); // triangle 2
             }
         }
 

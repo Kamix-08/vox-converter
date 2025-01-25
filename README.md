@@ -68,13 +68,12 @@ for (size_t i = 0; i < indices.size(); i += 3) {
 
 ### Limitations & Notes
 
-- **Opacity is ignored**—only RGB data is stored.
+- **Opacity is ignored** — only RGB data is stored.
 - **Supports only single-model `.vox` files**—files containing multiple models are not supported.
-- **Missing `RGBA` chunks will cause an error.**
-- **Model size limitation**—the module may not function correctly for models exceeding `255` units in any axis.
+- **Model size limitation** — the module may not function correctly for models exceeding `255` units in any axis.
 
 If you encounter issues or limitations, feel free to open an issue or submit a pull request!
 
 ### Acknowledgments
 
-Special thanks to [@Pawello09](https://github.com/Pawello09) for invaluable help in designing, implementing, and debugging this module—it wouldn't exist without him!
+Special thanks to [@Pawello09](https://github.com/Pawello09) for invaluable help in designing, implementing, and debugging this module — it wouldn't exist without him!

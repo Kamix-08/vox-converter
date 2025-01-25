@@ -34,7 +34,7 @@ namespace vox {
     struct process_data {
         std::unordered_map<uint8_t, std::vector<std::tuple<uint8_t, uint8_t, unsigned char>>>* face_map;
         const float* offset;
-        char (*palette)[4];
+        unsigned char (*palette)[4];
     };
 
     model_data merge_voxels(process_data);

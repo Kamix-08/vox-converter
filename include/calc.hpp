@@ -11,7 +11,7 @@ namespace vox {
     struct read_data {
         uint32_t* size;
         std::unordered_map<std::tuple<uint8_t, uint8_t, uint8_t>, unsigned char, vox::tuple_hash> voxels;
-        char (*palette)[4];
+        unsigned char (*palette)[4];
     };
 
     const char neighbour_map[6][3] = {

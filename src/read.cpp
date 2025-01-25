@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <cstdint>
 #include <tuple>
+#include <cstring>
 
 int vox::load_model(const std::string& filename, vox::model_data& model_data) {
     auto start = std::chrono::system_clock::now();
@@ -64,20 +65,14 @@ int vox::load_model(const std::string& filename, vox::model_data& model_data) {
         voxels[{buff[0], buff[1], buff[2]}] = buff[3];
     }
 
+    unsigned char palette[256][4];
+
     file.read(buff, 4);
     if(std::string(buff, 4) != "RGBA") {
-        std::cerr << "[!] Missing RGBA chunk. (" << filename << ")\n";
-        return 1;
-    }
-
-    file.seekg(2*4, std::ios::cur);
-
-    char palette[256][4];
-    file.read((char*)palette, 256*4);
-
-    if(file.peek() != EOF) {
-        std::cerr << "[!] Unexpected data after RGBA chunk. (" << filename << ")\n";
-        return 1;
+        std::memcpy(palette, default_palette, 256*4);
+    } else {
+        file.seekg(2 * 4, std::ios::cur);
+        file.read((char*)palette, 256 * 4);
     }
 
     file.close();
