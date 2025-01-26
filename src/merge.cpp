@@ -103,7 +103,7 @@ std::vector<vox::vertex> vox::merge_voxels(vox::process_data process_data) {
                     break;
                 }
 
-                const auto& clr = process_data.palette[color];
+                const auto& clr = process_data.palette[color-1];
                 std::tuple<float, float, float> c = {
 					clr[0] / 255.0f,
 					clr[1] / 255.0f,
