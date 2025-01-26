@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <vector>
 
-vox::model_data vox::calculate_vertices(const vox::read_data& read_data) {
+std::vector<vox::vertex> vox::calculate_vertices(const vox::read_data& read_data) {
     const float offset[2] = {
         (read_data.size[0] - 1) / 2.0f,
         (read_data.size[2] - 1) / 2.0f

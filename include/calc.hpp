@@ -20,7 +20,7 @@ namespace vox {
         {0, 0, 1}, { 0, 0,-1}  // +z, -z
     };
 
-    model_data calculate_vertices(const read_data&);
+    std::vector<vertex> calculate_vertices(const read_data&);
 }
 
 #endif // CALC_HPP

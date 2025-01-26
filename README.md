@@ -11,25 +11,26 @@ To use the module, include the `Vox.hpp` header:
 #include "Vox.hpp"
 ```
 
-It provides a single function, `load_model`, which loads a `.vox` file into a `model_data` structure:
+It provides a single function, `load_model`, which loads a `.vox` file into a `vector` of `vox::vertex`:
 
 ```cpp
-int vox::load_model(const std::string& filename, vox::model_data& model_data);
+int vox::load_model(const std::string& filename, std::vector<vox::vertex>& model_data);
 ```
 
 - Returns `0` if the operation is successful, and `1` otherwise.
-- Overwrites the provided `model_data` object with extracted model data.
+- Overwrites the provided `vector` object with extracted model data.
 
 #### Example Usage
 
 ```cpp
 #include "Vox.hpp"
 #include <cassert>
+#include <vector>
 
 int main() {
     const std::string file = "model.vox";
 
-    vox::model_data model;
+    std::vector<vox::vertex> model;
     assert(vox::load_model(file, model) == 0);
 
     return 0;
@@ -38,30 +39,28 @@ int main() {
 
 ### Data Structure
 
-The `vox::model_data` struct stores the extracted model information:
+The `vox::vertex` struct stores the information about each vertex:
 
 ```cpp
-struct model_data {
-    std::unordered_map<uint16_t, std::tuple<uint8_t, uint8_t, uint8_t>> colors;
-    std::vector<std::tuple<float, float, float>> vertices;
-    std::vector<uint16_t> indices;
+struct vertex {
+    std::tuple<float, float, float> pos;
+    std::tuple<float, float, float> col;
 };
 ```
 
-- `colors` maps each vertex (by index) to its RGB color `(0-255)`.
-- `vertices` is a list of vertex positions, with the model centered at `(0,0,0)`.
-- `indices` stores the vertex indices forming triangles.
+- `pos` is the position of the vertex (the model is centered at `(0,0)`).
+- `col` is the color data, RGB format, values are in the `(0,1)` range.
 
 #### Reading Triangles Correctly
 
-Since `indices` represents raw vertex connections, triangles should be read as follows:
+Since `load_models` return raw vertices, triangles should be read as follows:
 
 ```cpp
-for (size_t i = 0; i < indices.size(); i += 3) {
+for (size_t i = 0; i < vertices.size(); i += 3) {
     triangles.push_back({
-        indices[i],
-        indices[i + 1],
-        indices[i + 2]
+        veritces[i],
+        veritces[i + 1],
+        veritces[i + 2]
     });
 }
 ```

@@ -25,10 +25,9 @@ namespace vox {
         }
     };
 
-    struct model_data {
-        std::unordered_map<uint16_t, std::tuple<uint8_t, uint8_t, uint8_t>> colors;
-        std::vector<std::tuple<float, float, float>> vertices;
-        std::vector<uint16_t> indices;
+    struct vertex {
+        std::tuple<float, float, float> pos;
+        std::tuple<float, float, float> col;
     };
 
     struct process_data {
@@ -37,7 +36,7 @@ namespace vox {
         unsigned char (*palette)[4];
     };
 
-    model_data merge_voxels(process_data);
+    std::vector<vertex> merge_voxels(process_data);
 }
 
 #endif // MERGE_HPP

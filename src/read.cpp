@@ -9,7 +9,7 @@
 #include <tuple>
 #include <cstring>
 
-int vox::load_model(const std::string& filename, vox::model_data& model_data) {
+int vox::load_model(const std::string& filename, std::vector<vox::vertex>& model_data) {
     auto start = std::chrono::system_clock::now();
 
     std::ifstream file(filename, std::ios::binary);
