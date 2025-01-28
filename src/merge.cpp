@@ -110,6 +110,13 @@ std::vector<vox::vertex> vox::merge_voxels(vox::process_data process_data) {
 					clr[2] / 255.0f
 				};
 
+                for(int j=0; j<4; j++)
+                    f_ver[j] = {
+						std::get<0>(f_ver[j]) -= process_data.offset[0],
+						std::get<1>(f_ver[j]) -= process_data.offset[1],
+						std::get<2>(f_ver[j])
+					};
+
                 vertices.push_back({f_ver[2], c}); vertices.push_back({f_ver[1], c}); vertices.push_back({f_ver[0], c}); // triangle 1
                 vertices.push_back({f_ver[3], c}); vertices.push_back({f_ver[2], c}); vertices.push_back({f_ver[0], c}); // triangle 2
             }

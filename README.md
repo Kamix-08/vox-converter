@@ -70,6 +70,7 @@ for (size_t i = 0; i < vertices.size(); i += 3) {
 - **Opacity is ignored** — only RGB data is stored.
 - **Supports only single-model `.vox` files**—files containing multiple models are not supported.
 - **Model size limitation** — the module may not function correctly for models exceeding `255` units in any axis.
+- **Coordinate system** matches that of MagicaVoxel - `XZY` (`Z` axis points up), as opposed to "standard" `XYZ`.
 
 If you encounter issues or limitations, feel free to open an issue or submit a pull request!
 
