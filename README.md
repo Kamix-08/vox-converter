@@ -76,4 +76,4 @@ If you encounter issues or limitations, feel free to open an issue or submit a p
 
 ### Acknowledgments
 
-Special thanks to [@Pawello09](https://github.com/Pawello09) for invaluable help in designing, implementing, and debugging this module — it wouldn't exist without him!
+Special thanks to **[@Pawello09](https://github.com/Pawello09)** for invaluable help in designing, implementing, and debugging this module — it wouldn't exist without him!
